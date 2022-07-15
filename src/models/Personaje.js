@@ -1,5 +1,5 @@
 import { Model, DataTypes } from "sequelize";
-import sequelize from "./../conexion";
+import sequelize from "../database/conexion";
 
 class Personaje extends Model {}
 

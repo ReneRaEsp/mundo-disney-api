@@ -1,5 +1,5 @@
 import { Model, DataTypes } from "sequelize";
-import sequelize from "./../conexion";
+import sequelize from "../database/conexion";
 
 class PAV extends Model {}
 
@@ -14,7 +14,7 @@ PAV.init({
     type: DataTypes.DATEONLY,
   },
   calificacion: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.FLOAT,
     validate: {
         min: 1,
         max: 5

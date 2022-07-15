@@ -1,5 +1,5 @@
 import express from "express";
-import sequelize from "./conexion";
+import sequelize from "./database/conexion";
 require("./database/associations");
 
 async function main() {
@@ -11,7 +11,7 @@ async function main() {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.static(__dirname + "./../public"));
 
-  await sequelize.sync({ force: true });
+  await sequelize.sync({ force: false });
 
   app.listen(PORT, () => {
     console.log("Server on port", PORT);
