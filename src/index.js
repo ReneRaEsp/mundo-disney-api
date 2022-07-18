@@ -2,7 +2,8 @@ import express from "express";
 import sequelize from "./database/conexion";
 require("./database/associations");
 //Routes
-import personajeRoutes from "./routes/personajes";
+import personajesRoutes from "./routes/personajes";
+import usuariosRoutes from "./routes/users";
 
 async function main() {
   const PORT = process.env.PORT || 5000;
@@ -14,7 +15,8 @@ async function main() {
   app.use(express.static(__dirname + "./../public"));
 
   //Routes
-  app.use(personajeRoutes);
+  app.use(personajesRoutes);
+  app.use(usuariosRoutes);
 
   await sequelize.sync({ force: false });
 

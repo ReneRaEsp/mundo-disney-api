@@ -1,7 +1,6 @@
 //Models
 import Personaje from "./../models/Personaje";
 import PAV from "./../models/PAV";
-import Genero from "./../models/Genero";
 // Assosiations
 require("./../database/associations");
 
