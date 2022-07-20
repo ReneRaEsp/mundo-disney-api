@@ -6,7 +6,7 @@ export default {
   query: async (req, res, next) => {
     try {
       const user = await User.findByPk(req.params.id, {
-        attributes: ["username", "email", "status", "role"],
+        attributes: ["id", "username", "email", "status", "role"],
       });
       if (!user) {
         res.status(404).send({
@@ -19,29 +19,44 @@ export default {
       res.status(500).send({
         message: "Internal server error",
       });
-      next(e);
     }
   },
   list: async (req, res, next) => {
     try {
+      const users = await User.findAll({
+        attributes: ["id", "username", "email", "role", "status"],
+      });
+      res.status(200).send(users);
     } catch (e) {
       res.status(500).send({
         message: "Internal server error",
       });
-      next(e);
     }
   },
   update: async (req, res, next) => {
     try {
+      const user = User.update(
+        {
+          username: req.body.username,
+          email: req.body.email,
+          role: req.body.role,
+          status: req.body.status,
+        },
+        { where: { id: req.params.id } }
+      );
+      res.status(200).send(user);
     } catch (e) {
       res.status(500).send({
         message: "Internal server error",
       });
-      next(e);
     }
   },
   remove: async (req, res, next) => {
     try {
+      const user = await User.destroy({
+        where: { id: req.params.id },
+      });
+      res.status(200).send(user);
     } catch (e) {
       res.status(500).send({
         message: "Internal server error",
@@ -51,11 +66,38 @@ export default {
   },
   login: async (req, res, next) => {
     try {
+      const user = await User.findOne({ where: { email: req.body.email } });
+      if (user) {
+        const match = await bcrypt.compare(req.body.password, user.password);
+        if (match) {
+          const tokenReturn = await token.encode(
+            user.id,
+            user.username,
+            user.email,
+            user.role
+          );
+          res.status(200).json({
+            user: {
+              username: user.username,
+              email: user.email,
+              role: user.role,
+            },
+            tokenReturn,
+          });
+        } else {
+          res.status(404).send({
+            message: "Wrong Password",
+          });
+        }
+      } else {
+        res.status(404).send({
+          message: "User does not exist",
+        });
+      }
     } catch (e) {
       res.status(500).send({
-        message: "Internal server error",
+        message: "Internal server error while login",
       });
-      next(e);
     }
   },
   register: async (req, res, next) => {
@@ -71,7 +113,6 @@ export default {
       res.status(500).send({
         message: "Internal server error",
       });
-      next(e);
     }
   },
 };

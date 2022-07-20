@@ -14,7 +14,7 @@ export default {
             attributes: ["imagen", "titulo"],
           },
         ],
-        attributes: ["nombre", "imagen"],
+        attributes: ["id", "nombre", "imagen"],
       });
 
       res.status(200).send(personajes);

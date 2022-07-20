@@ -25,9 +25,9 @@ const checkToken = async (token) => {
 };
 
 export default {
-  encode: async (id, username, email) => {
+  encode: async (id, username, email, role) => {
     const token = jwt.sign(
-      { id: id, username: username, email: email },
+      { id: id, username: username, email: email, role: role },
       JWT_KEY,
       { expiresIn: "1d" }
     );
