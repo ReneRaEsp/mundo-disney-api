@@ -15,8 +15,8 @@ User.init(
       },
       unique: {
         args: true,
-        msg: "Must be unique"
-      }
+        msg: "Must be unique",
+      },
     },
     email: {
       type: DataTypes.STRING,
@@ -25,6 +25,10 @@ User.init(
           args: true,
           msg: "Must be a valid email",
         },
+      },
+      unique: {
+        args: true,
+        msg: "This email is already in use",
       },
     },
     password: {
