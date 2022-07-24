@@ -1,6 +1,43 @@
-import User from "./../models/User";
+//Node modules
 import bcrypt from "bcryptjs";
+import sgMail from "@sendgrid/mail";
+import dotenv from "dotenv";
+//Models
+import User from "./../models/User";
+//services
 import token from "../services/token";
+
+dotenv.config();
+
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+const SENDGRID_EMAIL_REGISTERED = process.env.SENDGRID_EMAIL_REGISTERED;
+const SENDGRID_SUBJECT = process.env.SENDGRID_SUBJECT;
+const SENDGRID_TEXT = process.env.SENDGRID_TEXT;
+const SENDGRID_EMAIL = process.env.SENDGRID_EMAIL;
+
+const setMsg = (to) => {
+  const msg = {
+    to,
+    from: SENDGRID_EMAIL_REGISTERED,
+    subject: SENDGRID_SUBJECT,
+    text: SENDGRID_TEXT,
+    html: SENDGRID_EMAIL,
+  };
+  return msg;
+};
+
+const sendEmail = (msg) => {
+  sgMail.setApiKey(SENDGRID_API_KEY);
+  sgMail.send(msg).then(
+    () => {},
+    (error) => {
+      console.log(error);
+      if (error.response) {
+        console.error(error.response.body);
+      }
+    }
+  );
+};
 
 export default {
   query: async (req, res, next) => {
@@ -103,12 +140,13 @@ export default {
   register: async (req, res, next) => {
     try {
       const password = await bcrypt.hash(req.body.password, 10);
-      await User.create({
+      const user = await User.create({
         username: req.body.username,
         email: req.body.email,
         password,
       });
-      res.status(200).send("User created");
+      sendEmail(setMsg(user.email));
+      res.status(200).send("Verify your email to confirm");
     } catch (e) {
       res.status(500).send({
         message: "Internal server error",

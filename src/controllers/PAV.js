@@ -2,15 +2,16 @@
 import PAV from "./../models/PAV";
 import Personaje from "./../models/Personaje";
 import Genero from "./../models/Genero";
-import { resolveShowConfigPath } from "@babel/core/lib/config/files";
-//Associations
 require("./../database/associations");
 
 export default {
   list: async (req, res, next) => {
+    let order = "";
+    req.query.order === "DESC" ? (order = "DESC") : (order = "ASC");
     try {
       const PAVs = await PAV.findAll({
         attributes: ["imagen", "titulo", "fechaCreacion"],
+        order: [["id", order]],
       });
       res.status(200).send(PAVs);
     } catch (err) {
@@ -20,6 +21,7 @@ export default {
   },
   query: async (req, res, next) => {
     try {
+      queries(res, req.query.name);
       const pav = await PAV.findByPk(req.params.id, {
         include: [
           {
@@ -43,9 +45,47 @@ export default {
       next(err);
     }
   },
+  pavQuery: async (req, res, next) => {
+    if (req.query.name) {
+      try {
+        const movie = await PAV.findOne({
+          where: {
+            titulo: req.query.name,
+          },
+        });
+        if (!movie) {
+          res.status(404).send({ message: "Movie not found" });
+        } else {
+          res.status(200).send(movie);
+        }
+      } catch (err) {
+        res.status(500).send({ message: "Internal server error" });
+        next(err);
+      }
+    } else if (req.query.genre) {
+      try {
+        const movie = await PAV.findAll({
+          where: {
+            generoId: req.query.genre,
+          },
+        });
+        if (!movie) {
+          res.status(404).send({ message: "Movie not found" });
+        } else {
+          res.status(200).send(movie);
+        }
+      } catch (err) {
+        res.status(500).send({ message: "Internal server error" });
+        next(err);
+      }
+    } else {
+      res.status(500).send({ message: "Internal server error" });
+    }
+  },
   add: async (req, res, next) => {
+    let genero;
     if (req.body.genero) {
-      const genero = await Genero.findByPk(req.body.genero);
+      genero = await Genero.findByPk(req.body.genero);
     }
     try {
       const pav = await PAV.create({

@@ -3,12 +3,14 @@ import PAVController from "./../controllers/PAV";
 import auth from "../middlewares/auth";
 
 const router = Router();
-const { list, query, add, update, remove, getGenero, addPersonaje, setGenero } = PAVController;
+const { list, query, pavQuery, add, update, remove, getGenero, addPersonaje, setGenero } = PAVController;
 const { verifyUser } = auth;
 
 router.get("/movies", verifyUser, list);
 
 router.get("/movies/:id", verifyUser, query);
+
+router.get("/movie", verifyUser, pavQuery);
 
 router.post("/movies", verifyUser, add);
 
